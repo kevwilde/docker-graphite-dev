@@ -1,0 +1,9 @@
+[submodule "graphite-web"]
+	path = graphite-web
+	url = git@github.com:kevwilde/graphite-web.git
+[submodule "carbon"]
+	path = carbon
+	url = https://github.com/graphite-project/carbon.git
+[submodule "whisper"]
+	path = whisper
+	url = https://github.com/graphite-project/whisper.git
