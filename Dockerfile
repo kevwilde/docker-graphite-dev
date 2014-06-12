@@ -5,12 +5,14 @@ MAINTAINER Kevin Van Wilder <kevin@van-wilder.be>
 
 RUN echo 'deb http://us.archive.ubuntu.com/ubuntu/ precise universe' >> /etc/apt/sources.list
 RUN apt-get -y update
-RUN apt-get -y install git libcairo2-dev python python-dev python-pip python-cairo-dev
+RUN apt-get -y install git libcairo2-dev python python-dev python-pip python-cairo-dev supervisor
 
 ADD ./requirements.txt /opt/graphite/requirements.txt
-ADD ./run.sh /run.sh
-RUN chmod 770 /run.sh
-RUN touch /first_run
+ADD ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Environment
+
+ENV GRAPHITE_STORAGE_DIR /opt/graphite/storage
 
 # Installing Dependencies
 
@@ -22,12 +24,14 @@ RUN pip install -r /opt/graphite/requirements.txt
 RUN cp /opt/graphite/conf/carbon.conf.example /opt/graphite/conf/carbon.conf
 RUN cp /opt/graphite/conf/storage-schemas.conf.example /opt/graphite/conf/storage-schemas.conf
 
-# Environment
+# Configuring Graphite
 
-ENV GRAPHITE_STORAGE_DIR /opt/graphite/storage
+RUN mkdir -p /opt/graphite/storage/log/webapp
 
 # Persistent Storage 
 
-VOLUME ["/opt/graphite"]
+VOLUME ["/opt/graphite", "/var/log/supervisor"]
 
-CMD /run.sh
+EXPOSE 8080 2003 2004 7002 25826/udp
+
+CMD	["/usr/bin/supervisord", "-n"]
